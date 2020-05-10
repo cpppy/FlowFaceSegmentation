@@ -14,7 +14,7 @@ from tqdm import tqdm
 class SegDataset(Dataset):
     def __init__(self,
                  data_dir='/data/data/train',
-                 format_size=(768, 512)
+                 format_size=(512, 768)
                  ):
         super(SegDataset, self).__init__()
         self.data_dir = data_dir
@@ -30,7 +30,7 @@ class SegDataset(Dataset):
             ch_dir
             for ch_dir in os.listdir(img_root_dir)
             if os.path.isdir(os.path.join(img_root_dir, ch_dir))
-        ][0:300]
+        ]#[0:300]
         img_fpath_list = []
         mask_fpath_list = []
         n_chdir = len(ch_dirs)
@@ -41,6 +41,7 @@ class SegDataset(Dataset):
             # print(img_dir)
             mask_dir = os.path.join(mask_root_dir, ch_dir)
             if not os.path.exists(mask_dir):
+                print('invalid_identify: {}'.format(ch_dir))
                 continue
             for img_fn in os.listdir(img_dir):
                 img_fpath = os.path.join(img_dir, img_fn)
@@ -78,7 +79,7 @@ class SegDataset(Dataset):
         # normalize
         img_data = self._normalize(img_cv2)
         img_data = np.transpose(img_data, axes=[2, 0, 1])
-        mask_data = np.asarray(mask_cv2, dtype=np.int32)
+        mask_data = np.asarray(mask_cv2, dtype=np.long)
         return img_data, mask_data
 
 
@@ -88,4 +89,7 @@ if __name__=='__main__':
     seg_dataset = SegDataset()
     for i in range(3):
         sample = seg_dataset.__getitem__(i)
-        print(sample)
+        img, mask = sample
+        print(mask.shape)
+        print(np.min(mask), np.max(mask))
+        print(mask)

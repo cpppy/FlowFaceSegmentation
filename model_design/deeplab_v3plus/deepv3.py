@@ -191,8 +191,8 @@ class DeepV3Plus(nn.Module):
         dec1 = self.final(dec0)
         main_out = Upsample(dec1, x_size[2:])
 
-        if self.training:
-            return self.criterion(main_out, gts)
+        # if self.training:
+        #     return self.criterion(main_out, gts)
 
         return main_out
 
@@ -309,11 +309,11 @@ def DeepSRNX101V3PlusD_m1(num_classes, criterion):
 
 if __name__=='__main__':
 
-    model = DeepV3Plus(num_classes=2, trunk='seresnext-101')
-    model.eval()
+    model = DeepV3Plus(num_classes=17, trunk='seresnext-101')
+    model.train()
     input = torch.randn(2, 3, 512, 512, dtype=torch.float32)
     output = model(input)
-    print(output.size())
+    print(output)
 
 
 

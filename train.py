@@ -9,13 +9,13 @@ from checkpoint_mgr.checkpoint_mgr import CheckpointMgr
 import numpy as np
 import os
 
-os.environ["CUDA_VISIBLE_DEVICES"] = 0
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 def main():
 
     dataset = SegDataset()
     data_loader = DataLoader(dataset=dataset,
-                             batch_size=1,
+                             batch_size=8,
                              shuffle=True,
                              num_workers=1,
                              pin_memory=False,
@@ -42,14 +42,13 @@ def main():
             gt_masks = gt_masks.cuda()
 
             output = model(inputs=input_x, labels=gt_masks)
-            total_loss = torch.mean(output['loss'])
+            loss = output['loss']
 
             optimizer.zero_grad()
-            total_loss.backward()
-            # nn.utils.clip_grad_value_(model.module.parameters(), clip_value=0.1)
+            loss.backward()
             optimizer.step()
 
-            loss_list.append(total_loss.item())
+            loss_list.append(loss.item())
             # # calc acc
             # pred = torch.max(scores, 1).indices
             # train_correct = (pred == gt_labels).sum().item()
@@ -57,12 +56,14 @@ def main():
             # acc_list.append(train_acc)
 
             steps = (idx + 1 + epoch * len(data_loader))
+            lr = optimizer.param_groups[0]['lr']
 
             log_interval = 1
             if steps % log_interval == 0:
-                print('epoch[{}][{}/{}] loss:{:.3f}'.format(epoch + 1,
+                print('epoch[{}][{}/{}] lr:{}, loss:{:.3f}'.format(epoch + 1,
                                                                    idx + 1,
                                                                    len(data_loader),
+                                                                   lr,
                                                                    np.mean(loss_list),
                                                                    ))
                 loss_list.clear()
