@@ -13,12 +13,12 @@ class DeepLabV3Plus(nn.Module):
         self.seg_module = DeepV3Plus(num_classes=n_cls, trunk='seresnext-101')
         self.criterion = CrossEntropyLoss2d()
 
-    def foward_train(self, inputs, labels):
+    def forward_train(self, inputs, labels):
         seg_map = self.seg_module(inputs)
         loss = self.criterion(inputs, labels)
         return dict(seg_map=seg_map, loss=loss)
 
-    def foward_test(self, inputs):
+    def forward_test(self, inputs):
         seg_map = self.seg_module(inputs)
         return dict(seg_map=seg_map)
 
