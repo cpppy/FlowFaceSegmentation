@@ -15,7 +15,7 @@ def main():
 
     dataset = SegDataset()
     data_loader = DataLoader(dataset=dataset,
-                             batch_size=8,
+                             batch_size=2,
                              shuffle=True,
                              num_workers=1,
                              pin_memory=False,
